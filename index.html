@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的云端恋爱日记 |张xx &喻xx</title>
+    <style>
+        :root {
+            --primary: #ff6b9e;
+            --secondary: #6bd5ff;
+            --bg: #fef6f9;
+            --text: #333;
+            --card: white;
+        }
+        /* 隐私遮罩样式（已移除功能，仅保留样式以防后续需要） */
+        .privacy-mask, .privacy-mask * {
+            color: transparent !important;
+            text-shadow: 0 0 8px #888, 0 0 12px #ccc;
+            user-select: none !important;
+            cursor: not-allowed !important;
+        }
+        .privacy-mask input, .privacy-mask textarea {
+            background: #eee !important;
+            color: transparent !important;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 200, 239, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hearts {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .heart {
+            position: absolute;
+            opacity: 0;
+            font-size: 1.5rem;
+            animation: float 6s ease-in infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        
+        .memory-counter {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        .counter-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .counter-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .small {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+            margin: 3rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+        
+        .timeline-date {
+            position: absolute;
+            left: -50px;
+            width: 40px;
+            text-align: right;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .timeline-content {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 20px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 3px solid var(--bg);
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        
+        .media-item {
+            border-radius: 8px;
+            overflow: hidden;
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .media-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .quote {
+            font-style: italic;
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+            background-color: rgba(255, 107, 158, 0.1);
+            margin: 1rem 0;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* 纪念日弹窗样式 */
+        .anniversary-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s;
+        }
+        
+        .anniversary-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 实时时钟样式 */
+        .real-time-clock {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        /* 互动按钮 */
+        .interactive-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .interactive-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                padding: 1.2rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 0.5rem; }
+            .memory-counter {
+                padding: 1.1rem 0.5rem;
+                margin: 1.1rem 0;
+            }
+            .timeline { padding-left: 18px; }
+            .timeline-date { left: -18px; width: 18px; font-size: 0.8rem; }
+            h1 { font-size: 1.3rem; }
+            .counter-number { font-size: 1.2rem; }
+            .media-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            .media-item {
+                height: 90px;
+            }
+            .anniversary-content {
+                padding: 1.1rem 0.5rem;
+                max-width: 98vw;
+            }
+            #quit-smoking-modal > div {
+                padding: 1.1rem 0.5rem 1rem 0.5rem !important;
+                max-width: 98vw !important;
+            }
+            #custom-dialog-box {
+                padding: 1.1rem 0.5rem 1rem 0.5rem !important;
+                max-width: 98vw !important;
+            }
+            .interactive-btn {
+                font-size: 0.95rem;
+                padding: 0.4rem 0.7rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0.2rem; }
+            .memory-counter {
+                padding: 0.7rem 0.2rem;
+                margin: 0.7rem 0;
+            }
+            .media-grid {
+                grid-template-columns: 1fr;
+                gap: 4px;
+            }
+            .media-item {
+                height: 60vw;
+                min-height: 80px;
+            }
+            .anniversary-content, #quit-smoking-modal > div, #custom-dialog-box {
+                padding: 0.7rem 0.2rem 0.7rem 0.2rem !important;
+                max-width: 99vw !important;
+            }
+            .interactive-btn {
+                font-size: 0.9rem;
+                padding: 0.3rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="privacy-mask-root">
+    <!-- 通用自定义弹窗组件（alert/prompt/confirm） -->
+    <div id="custom-dialog-mask" style="display:none;position:fixed;z-index:200000;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);justify-content:center;align-items:center;"></div>
+    <div id="custom-dialog" style="display:none;position:fixed;z-index:200001;top:0;left:0;width:100vw;height:100vh;justify-content:center;align-items:center;">
+      <div id="custom-dialog-box" style="background:#fff;padding:1.5rem 1.2rem 1.2rem 1.2rem;border-radius:16px;max-width:340px;width:90vw;box-shadow:0 8px 32px #0005;position:relative;text-align:center;">
+        <div id="custom-dialog-title" style="font-size:1.15rem;color:#ff6b9e;margin-bottom:0.7rem;"></div>
+        <div id="custom-dialog-content" style="color:#333;font-size:1.05rem;margin-bottom:1rem;word-break:break-all;"></div>
+        <input id="custom-dialog-input" style="display:none;width:90%;margin-bottom:1rem;padding:0.5rem;border-radius:8px;border:1px solid #eee;font-size:1rem;" />
+        <div style="margin-top:0.5rem;">
+          <button id="custom-dialog-ok" class="interactive-btn" style="min-width:60px;margin:0 0.5rem;">确定</button>
+          <button id="custom-dialog-cancel" class="interactive-btn" style="background:#fff6fa;color:#ff6b9e;border:1px solid #ffb6d5;min-width:60px;margin:0 0.5rem;display:none;">取消</button>
+        </div>
+      </div>
+    </div>
+    <div id="quit-smoking-modal" style="display:none;position:fixed;z-index:100000;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;">
+        <div style="background:#fff;padding:2rem 1.5rem 1.2rem 1.5rem;border-radius:18px;max-width:370px;width:92vw;box-shadow:0 8px 32px #0005;position:relative;text-align:center;">
+            <button onclick="closeQuitSmokingModal()" style="position:absolute;top:10px;right:16px;font-size:1.5rem;background:none;border:none;color:#888;cursor:pointer;">×</button>
+            <h2 style="color:#ff6b9e;margin-bottom:0.7rem;">戒烟打卡</h2>
+            <div id="qs-days" style="font-size:1.7rem;font-weight:bold;margin-bottom:0.2rem;"></div>
+            <div id="qs-streaks" style="color:#6bd5ff;font-size:1.05rem;margin-bottom:0.2rem;"></div>
+            <div id="qs-last-date" style="color:#888;font-size:0.95rem;margin-bottom:0.7rem;"></div>
+            <button id="qs-punch-btn" class="interactive-btn" style="margin-bottom:0.7rem;">今日打卡</button>
+            <button id="qs-reset-btn" class="interactive-btn" style="background:#fff6fa;color:#ff6b9e;border:1px solid #ffb6d5;margin-left:0.5rem;margin-bottom:0.7rem;">重置打卡</button>
+            <div id="qs-msg" style="margin-top:0.3rem;color:#6bd5ff;font-size:1.1rem;"></div>
+            <div id="qs-history" style="margin-top:0.7rem;text-align:left;font-size:0.98rem;background:#f6faff;border-radius:10px;padding:0.7rem 0.7rem 0.5rem 0.7rem;max-height:120px;overflow-y:auto;"></div>
+        </div>
+    </div>
+    <header>
+        <div class="hearts" id="hearts-container"></div>
+        <!-- 主标题，连续点击5次可进入戒烟打卡页面（隐藏入口） -->
+        <h1 id="main-title">我们的云端恋爱日记</h1>
+        <div class="subtitle">张xx ❤️喻xx | 开始于 <span id="start-date">2025年8月2日</span></div>
+        <div class="real-time-clock" id="current-time">正在加载时间...</div>
+    </header>
+
+    <canvas id="bg-bubbles-canvas" style="position:fixed;z-index:0;top:0;left:0;width:100vw;height:100vh;pointer-events:none;"></canvas>
+    <canvas id="bg-bubbles-canvas" style="position:fixed;z-index:0;top:0;left:0;width:100vw;height:100vh;pointer-events:none;"></canvas>
+    
+    <div class="container">
+        <!-- 恋爱动态区块 -->
+        <div class="memory-counter" style="background: #f6fff9; color: #6bd5ff; margin-bottom:2rem;">
+            <h2 style="color:#6bd5ff;">恋爱动态</h2>
+            <div id="love-feed-list" style="min-height:2.5em;font-size:1.08rem;line-height:1.7;"></div>
+            <div id="love-feed-loading" style="color:#bbb;font-size:0.95rem;">动态加载中...</div>
+        </div>
+        <div class="memory-counter">
+            <div class="counter-label">我们已经相爱</div>
+            <div class="counter-number" id="days-together">0天</div>
+            <div class="counter-label" id="next-anniversary">距离100天纪念日还有83天</div>
+            <button class="interactive-btn" onclick="showMemoryPrompt()">添加新回忆</button>
+            <button class="interactive-btn" style="background:#fff6fa;color:#ff6b9e;border:1px solid #ffb6d5;" onclick="showLuckyNote()">抽一支幸运签</button>
+            <button class="interactive-btn" style="background:#f6fff9;color:#6bd5ff;border:1px solid #b6eaff;" onclick="showLoveQuiz()">情侣默契问答</button>
+        </div>
+
+        <!-- 甜蜜相册互动区块 -->
+        <div class="memory-counter" style="background: #fff6fa; color: #ff6b9e; margin-bottom:2rem;">
+            <h2 style="color:#ff6b9e;">甜蜜相册</h2>
+            <!-- 相册顺序如需调整请同步修改order属性和注释 -->
+            <div class="media-grid" style="grid-auto-flow: row;">
+                <!-- 1. 第一张照片：微信图片_2025-08-07_084038_490.jpg -->
+                <div class="media-item" data-img="微信图片_2025-08-07_084038_490.jpg" style="background-image: url('微信图片_2025-08-07_084038_490.jpg'); position:relative; order:1;" onclick="showImageModal('微信图片_2025-08-07_084038_490.jpg')">
+                    <div class="img-blur-mask"></div>
+                </div>
+                <!-- 2. 第二张照片：微信图片_2025-08-07_084515_365.png -->
+                <div class="media-item" data-img="微信图片_2025-08-08_094627_680.jpg" style="background-image: url('微信图片_2025-08-08_094627_680.jpg'); position:relative; order:2;" onclick="showImageModal('微信图片_2025-08-07_084515_365.png')">
+                    <div class="img-blur-mask"></div>
+                </div>
+                <!-- 3. 第三张照片：新照片占位 -->
+                <div class="media-item" data-img="微信图片_2025-08-08_091039_346.jpg" style="background-image: url('微信图片_2025-08-08_091039_346.jpg'); position:relative; order:3;" onclick="showImageModal('微信图片_2025-08-08_091039_346.jpg')">
+                    <div class="img-blur-mask"></div>
+                </div>
+                <!-- 4. 第四张照片：微信图片_2025-08-07_084800_991.png -->
+                <div class="media-item" data-img="微信图片_2025-08-07_084800_991.png" style="background-image: url('微信图片_2025-08-07_084800_991.png'); position:relative; order:4;" onclick="showImageModal('微信图片_2025-08-07_084800_991.png')">
+                    <div class="img-blur-mask"></div>
+                </div>
+                <!-- 5. 第五张照片：微信图片_20250806001442_7.jpg -->
+                <div class="media-item" data-img="微信图片_20250805234054_6.jpg" style="background-image: url('微信图片_20250805234054_6.jpg'); position:relative; order:5;" onclick="showImageModal('微信图片_2025-08-08_094627_680.jpg')">
+                    <div class="img-blur-mask"></div>
+                </div>
+            <!-- 如需调整顺序请同步修改order属性和注释 -->
+            </div>
+            <div style="margin-top:1rem;">
+                <button class="interactive-btn" onclick="showAlert('如需添加新照片请联系开发者~')">添加新照片</button>
+            </div>
+        </div>
+
+        <!-- 每日一句互动祝福区块 -->
+        <div class="memory-counter" style="background: #f6fff9; color: #6bd5ff; margin-bottom:2rem;">
+            <h2 style="color:#6bd5ff;">每日一句</h2>
+            <div id="daily-quote" style="font-size:1.2rem; margin:1rem 0;">加载中...</div>
+            <button class="interactive-btn" onclick="showRandomQuote()">换一句</button>
+        </div>
+    <!-- 图片大图弹窗 -->
+    <div id="image-modal" style="display:none;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;">
+        <img id="modal-img" src="" style="max-width:90vw;max-height:80vh;border-radius:12px;box-shadow:0 8px 32px #0008;">
+        <button onclick="closeImageModal()" style="position:absolute;top:30px;right:40px;font-size:2rem;background:none;border:none;color:#fff;cursor:pointer;">×</button>
+    </div>
+    <script>
+    // 自定义弹窗组件（alert/prompt/confirm）
+    (function(){
+      const mask = document.getElementById('custom-dialog-mask');
+      const dialog = document.getElementById('custom-dialog');
+      const box = document.getElementById('custom-dialog-box');
+      const title = document.getElementById('custom-dialog-title');
+      const content = document.getElementById('custom-dialog-content');
+      const input = document.getElementById('custom-dialog-input');
+      const okBtn = document.getElementById('custom-dialog-ok');
+      const cancelBtn = document.getElementById('custom-dialog-cancel');
+      let cb = null;
+      let mode = 'alert';
+      function closeDialog(val) {
+        mask.style.display = 'none';
+        dialog.style.display = 'none';
+        input.value = '';
+        input.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        if(cb) cb(val);
+        cb = null;
+      }
+      window.showAlert = function(msg, callback, optTitle) {
+        mode = 'alert';
+        title.textContent = optTitle || '提示';
+        content.textContent = msg;
+        input.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        mask.style.display = dialog.style.display = 'flex';
+        cb = callback;
+      };
+      window.showConfirm = function(msg, callback, optTitle) {
+        mode = 'confirm';
+        title.textContent = optTitle || '请确认';
+        content.textContent = msg;
+        input.style.display = 'none';
+        cancelBtn.style.display = 'inline-block';
+        mask.style.display = dialog.style.display = 'flex';
+        cb = callback;
+      };
+      window.showPrompt = function(msg, callback, optTitle, defaultVal) {
+        mode = 'prompt';
+        title.textContent = optTitle || '请输入';
+        content.textContent = msg;
+        input.style.display = 'block';
+        input.value = defaultVal || '';
+        cancelBtn.style.display = 'inline-block';
+        mask.style.display = dialog.style.display = 'flex';
+        cb = callback;
+        setTimeout(()=>{input.focus();}, 100);
+      };
+      okBtn.onclick = function() {
+        if(mode==='prompt') closeDialog(input.value);
+        else if(mode==='confirm') closeDialog(true);
+        else closeDialog();
+      };
+      cancelBtn.onclick = function() {
+        if(mode==='prompt') closeDialog(null);
+        else if(mode==='confirm') closeDialog(false);
+      };
+      mask.onclick = function(e) { /* 点击遮罩不关闭 */ };
+      dialog.onclick = function(e) { if(e.target===dialog) closeDialog(); };
+      input.onkeydown = function(e) { if(e.key==='Enter') okBtn.click(); };
+    })();
+    // 背景彩色气泡动图效果
+    (function() {
+        const canvas = document.getElementById('bg-bubbles-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let dpr = window.devicePixelRatio || 1;
+        let width = window.innerWidth, height = window.innerHeight;
+        function resize() {
+            dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        // 气泡参数
+        const colors = ['#ff6b9e', '#6bd5ff', '#ffd56b', '#9e6bff', '#baffc9', '#fff6fa'];
+        const bubbles = [];
+        const BUBBLE_COUNT = 18;
+        for (let i = 0; i < BUBBLE_COUNT; i++) {
+            bubbles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                r: 20 + Math.random() * 40,
+                color: colors[Math.floor(Math.random()*colors.length)],
+                speed: 0.3 + Math.random() * 0.7,
+                dx: (Math.random()-0.5)*0.3,
+                alpha: 0.15 + Math.random()*0.15
+            });
+        }
+        function draw() {
+            ctx.clearRect(0,0,width,height);
+            for (const b of bubbles) {
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+                ctx.closePath();
+                ctx.fillStyle = b.color;
+                ctx.shadowColor = b.color;
+                ctx.shadowBlur = 16;
+                ctx.fill();
+                ctx.restore();
+                // update
+                b.y -= b.speed;
+                b.x += b.dx;
+                if (b.y + b.r < 0) {
+                    b.y = height + b.r;
+                    b.x = Math.random() * width;
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    // 相册图片加载检测，自动隐藏加载失败的图片项
+    window.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.media-item[data-img]').forEach(function(item) {
+            var img = new window.Image();
+            img.onload = function() { /* 图片加载成功，无需处理 */ };
+            img.onerror = function(e) {
+                // 显示详细错误信息
+                var src = item.getAttribute('data-img');
+                var msg = '相册图片加载失败：' + src + '\n';
+                msg += '请检查图片路径、文件名、格式、大小写、权限等。';
+            showAlert(msg);
+                // 控制台输出更详细的事件对象
+                console.error('图片加载失败', src, e);
+                item.style.display = 'none';
+            };
+            img.src = item.getAttribute('data-img');
+        });
+    });
+    // 甜蜜相册弹窗
+    function showImageModal(url) {
+        document.getElementById('modal-img').src = url;
+        document.getElementById('image-modal').style.display = 'flex';
+    }
+    function closeImageModal() {
+        document.getElementById('image-modal').style.display = 'none';
+        document.getElementById('modal-img').src = '';
+    }
+    // 每日一句祝福
+    const quotes = [
+        '愿我们一直甜到老，岁月静好。',
+        '你笑起来真像夏天的风。',
+        '和你在一起，每一天都值得纪念。',
+        '世界很大，遇见你刚刚好。',
+        '你是我最美的风景。',
+        '陪你看日落的人比日落更温柔。',
+        '我喜欢你，像风走了八千里，不问归期。',
+        '你是我心里的小太阳。',
+        '有你在，连平凡的日子都闪闪发光。',
+        '余生请多指教。',
+        '你的出现让我的世界变得温柔又明亮。',
+        '每天醒来第一件事就是想你。',
+        '你是我心中永远的宝藏。',
+        '有你的日子，连空气都是甜的。',
+        '想和你一起看遍四季的风景。',
+        '你是我最温暖的依靠。',
+        '遇见你，是我最美的意外。',
+        '你的笑容是我每天的动力。',
+        '和你在一起，时间总是过得太快。',
+        '愿我们的故事没有结局，只剩幸福。'
+    ];
+    function showRandomQuote() {
+        const idx = Math.floor(Math.random() * quotes.length);
+        document.getElementById('daily-quote').textContent = quotes[idx];
+    }
+    // 页面加载时自动显示一句
+    window.addEventListener('DOMContentLoaded', function() {
+        showRandomQuote();
+    });
+    // 恋爱动态自动加载（支持图片和视频）
+    /*
+    love-feed.json 每条动态可包含：
+    {
+      "date": "2025-08-08",
+      "text": "一起看了电影，超级开心！",
+      "img": "movie.jpg", // 可选，图片路径或URL
+      "video": "movie.mp4" // 可选，视频路径或URL
+    }
+    图片和视频字段均为可选，支持本地文件或网络链接。图片建议放在同目录或img子目录，视频同理。
+    */
+    (function(){
+        const feedList = document.getElementById('love-feed-list');
+        const feedLoading = document.getElementById('love-feed-loading');
+        fetch('love-feed.json?_t='+Date.now())
+        .then(r=>r.ok?r.json():[])
+        .then(list=>{
+            feedLoading.style.display = 'none';
+            if(!Array.isArray(list)||list.length===0){
+                feedList.innerHTML = '<span style="color:#bbb;">暂无动态</span>';
+                return;
+            }
+            feedList.innerHTML = list.map(item=>{
+                let html = `<div style='margin-bottom:0.9em;'><span style='color:#ff6b9e;font-weight:bold;'>${item.date}</span>：${item.text || ''}`;
+                if(item.img){
+                    html += `<br><img src='${item.img}' alt='动态图片' style='max-width:90%;margin-top:0.3em;border-radius:8px;box-shadow:0 2px 8px #0001;'>`;
+                }
+                if(item.video){
+                    html += `<br><video src='${item.video}' controls style='max-width:90%;margin-top:0.3em;border-radius:8px;box-shadow:0 2px 8px #0001;'></video>`;
+                }
+                html += '</div>';
+                return html;
+            }).join('');
+        })
+        .catch(()=>{
+            feedLoading.textContent = '动态加载失败';
+        });
+    })();
+    </script>
+        
+        <div class="timeline">
+            <!-- 初遇次元 -->
+            <div class="timeline-item">
+                <div class="timeline-date">2025.6</div>
+                <div class="timeline-content">
+                    <h2>🌐 初遇次元</h2>
+                    <p>我通过我的同学在快手认识的你（6月7日），我看了你的视频，看到你的第一眼便觉得你是一个不可辜负的人。</p>
+                    <div class="quote">"我加你好友后的第一句话是：“你好”，我本来以想朋友的身份与你相处可现在......</div>
+                    <div class="media-grid">
+                        <div class="media-item" style="background-image: url('微信图片_20250806001442_7.jpg'); position:relative;">
+                            <div class="img-blur-mask"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url('微信图片_2025-08-08_101314_565.jpg'); position:relative;">
+                            <div class="img-blur-mask"></div>
+        <style>
+        .img-blur-mask {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.3);
+            border-radius: 8px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        </style>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 破壁时刻 -->
+            <div class="timeline-item">
+                <div class="timeline-date">2025.7</div>
+                <div class="timeline-content">
+                    <h2>💬 破壁时刻</h2>
+                    <p>从欣赏到喜欢你的转折点是在一次你和我敞开心扉的聊天中，你的活泼、热情、聪敏打动了我。</p>
+                    <p>第一次视频是在7月29日，你害羞地用特效挡着脸，但眼睛笑起来像月牙一样美。</p>
+                    <button class="interactive-btn" onclick="playOurSong()">播放我们的歌</button>
+                    <button class="interactive-btn" onclick="searchAndPlaySong()">切换网易云歌曲</button> <!-- 新增按钮，点击弹窗输入网易云ID -->
+                </div>
+            </div>
+
+            <!-- 关系升级 -->
+            <div class="timeline-item">
+                <div class="timeline-date">2025.7.20</div>
+                <div class="timeline-content">
+                    <h2>🚀 关系升级</h2>
+                    <p>8月2日05:20分，我在QQ对你表白，你看到后说"我同意！"。</p>
+                    <p>我们的情侣标志：亲昵的称呼+象征着你和我背景的头像</p>
+                    <div class="media-grid">
+                        <div class="media-item" style="background-image: url('微信图片_2025-08-05_232113_934.jpg')"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 云端甜蜜清单 -->
+            <div class="timeline-item">
+                <div class="timeline-date">2025.8</div>
+                <div class="timeline-content">
+                    <h2>💻 云端甜蜜清单</h2>
+                    <p>我们一起完成的事：</p>
+                    <ul>
+                        <li>Thinking~</li>
+                        <li>Thinking~</li>
+                        <li>Thinking~</li>
+                    </ul>
+                    <p>互相送过的虚拟礼物：</p>
+                    <ul>
+                        <li>Thinking~</li>
+                        <li>Thinking~</li>
+                    </ul>
+                    <button class="interactive-btn" onclick="showLoveCalculator()">测试我们的匹配度</button>
+                </div>
+            </div>
+            
+            <!-- 未来信号塔 -->
+            <div class="timeline-item">
+                <div class="timeline-date">未来</div>
+                <div class="timeline-content">
+                    <h2>📡 未来信号塔</h2>
+                    <p>我们计划在......第一次见面，地点定在......</p>
+                    <p>长远的梦想：</p>
+                    <ul>
+                        <li>Thinking~</li>
+                        <li>Thinking~</li>
+                        <li>Thinking~</li>
+                    </ul>
+                    <div id="countdown" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>用代码编织的爱意 | 最后更新于 <span id="update-date"></span></p>
+        <p>开发者wechat：zly_137,QQ:2369157249(注明来意！)</p>
+        <button class="interactive-btn" style="margin-top:1rem;background:#fff6fa;color:#ff6b9e;border:1px solid #ffb6d5;" onclick="showWhisperInput()">写一句悄悄话</button>
+        <button class="interactive-btn" style="margin-top:1rem;background:#f6fff9;color:#6bd5ff;border:1px solid #b6eaff;" onclick="showConfessionWall()">表白墙</button>
+    </footer>
+
+    <!-- 悄悄话弹幕容器 -->
+    <div id="whisper-barrage-container" style="position:fixed;left:0;bottom:40px;width:100vw;z-index:99998;pointer-events:none;"></div>
+
+    <script>
+    // 页面点击随机飘落爱心动画
+    document.addEventListener('click', function(e) {
+        // 只在主区域点击才触发
+        if (e.target.closest('button,.media-item,#image-modal')) return;
+        const heart = document.createElement('div');
+        heart.textContent = '💖';
+        heart.style.position = 'fixed';
+        heart.style.left = e.clientX - 16 + 'px';
+        heart.style.top = e.clientY - 16 + 'px';
+        heart.style.fontSize = (24 + Math.random()*16) + 'px';
+        heart.style.opacity = 0.85;
+        heart.style.pointerEvents = 'none';
+        heart.style.transition = 'transform 1.2s cubic-bezier(.2,1.2,.4,1), opacity 1.2s';
+        heart.style.transform = 'translateY(0) scale(1)';
+        document.body.appendChild(heart);
+        setTimeout(()=>{
+            heart.style.transform = `translateY(-120px) scale(${1.2+Math.random()*0.6})`;
+            heart.style.opacity = 0;
+        }, 10);
+        setTimeout(()=>heart.remove(), 1300);
+    });
+
+// 幸运签功能
+function showLuckyNote() {
+    const notes = [
+        '你们的爱情会像今天的阳光一样温暖明亮~',
+        '未来的每一天都值得期待，甜蜜会一直延续！',
+        '你们的故事会比童话更美好~',
+        '幸福就在身边，珍惜每一次心动~',
+        '愿你们的感情像幸运签一样，抽到的都是好消息！',
+        '今天会有小惊喜降临哦！',
+        '你们的默契值已满分！',
+        '爱意如初，甜蜜如故。',
+        '你们的未来会很闪耀！',
+        '愿你们的每一天都被爱包围~'
+    ];
+        const idx = Math.floor(Math.random() * notes.length);
+        showAlert('🎁 幸运签：\n' + notes[idx]);
+}
+
+// 表白墙弹幕功能
+function showConfessionWall() {
+    showPrompt('在表白墙写下你的心里话（会以弹幕形式飘过页面顶部）：', function(confession) {
+        if (confession && confession.trim()) {
+            addConfessionBarrage(confession.trim());
+        }
+    });
+}
+function addConfessionBarrage(text) {
+    let container = document.getElementById('confession-barrage-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'confession-barrage-container';
+        container.style.position = 'fixed';
+        container.style.left = '0';
+        container.style.top = '20px';
+        container.style.width = '100vw';
+        container.style.zIndex = '99999';
+        container.style.pointerEvents = 'none';
+        document.body.appendChild(container);
+    }
+    const span = document.createElement('span');
+    span.textContent = text;
+    span.style.position = 'absolute';
+    span.style.left = '100vw';
+    span.style.top = (Math.random()*20) + 'px';
+    span.style.whiteSpace = 'nowrap';
+    span.style.fontSize = (18+Math.random()*8)+'px';
+    span.style.color = ['#ff6b9e','#6bd5ff','#ffd56b','#9e6bff','#baffc9'][Math.floor(Math.random()*5)];
+    span.style.background = 'rgba(255,255,255,0.85)';
+    span.style.borderRadius = '16px';
+    span.style.padding = '4px 16px';
+    span.style.marginRight = '8px';
+    span.style.boxShadow = '0 2px 8px #0001';
+    span.style.opacity = 0.98;
+    span.style.pointerEvents = 'none';
+    const duration = 8 + Math.random()*3;
+    span.style.transition = `transform ${duration}s linear`;
+    container.appendChild(span);
+    setTimeout(()=>{
+        span.style.transform = `translateX(-110vw)`;
+    }, 30);
+    setTimeout(()=>span.remove(), duration*1000+1000);
+}
+
+// 情侣默契问答功能
+function showLoveQuiz() {
+    const quizList = [
+        {
+            q: '第一次见面你们最想做什么？',
+            a: ['A. 拥抱', 'B. 吃好吃的', 'C. 看电影', 'D. 一起散步']
+        },
+        {
+            q: '你觉得对方最可爱的地方是？',
+            a: ['A. 笑容', 'B. 声音', 'C. 性格', 'D. 眼睛']
+        },
+        {
+            q: '你们最想一起去的地方？',
+            a: ['A. 海边', 'B. 游乐园', 'C. 山顶', 'D. 家里']
+        },
+        {
+            q: '谁更容易先认错？',
+            a: ['A. 我', 'B. 对方', 'C. 看情况', 'D. 都不认错']
+        },
+        {
+            q: '你们的爱情主题色是？',
+            a: ['A. 粉色', 'B. 蓝色', 'C. 黄色', 'D. 紫色']
+        },
+        {
+            q: '你们第一次约会最难忘的瞬间是？',
+            a: ['A. 牵手', 'B. 拍照', 'C. 吃美食', 'D. 看电影']
+        },
+        {
+            q: '对方最喜欢的饮料是？',
+            a: ['A. 奶茶', 'B. 咖啡', 'C. 果汁', 'D. 碳酸饮料']
+        },
+        {
+            q: '你们最常用的情侣昵称是？',
+            a: ['A. 宝宝', 'B. 亲爱的', 'C. 小猪', 'D. 独家昵称']
+        },
+        {
+            q: '谁更爱吃零食？',
+            a: ['A. 我', 'B. 对方', 'C. 都爱', 'D. 都不爱']
+        },
+        {
+            q: '你们最想一起完成的愿望是？',
+            a: ['A. 一起旅行', 'B. 拍情侣写真', 'C. 养宠物', 'D. 共同买房']
+        },
+        {
+            q: '对方最怕的东西是？',
+            a: ['A. 昆虫', 'B. 黑暗', 'C. 高空', 'D. 独处']
+        },
+        {
+            q: '你们最喜欢一起做的事情？',
+            a: ['A. 看电影', 'B. 散步', 'C. 做饭', 'D. 打游戏']
+        },
+        {
+            q: '谁更喜欢撒娇？',
+            a: ['A. 我', 'B. 对方', 'C. 都会', 'D. 都不撒娇']
+        },
+        {
+            q: '你们的专属纪念日是哪一天？',
+            a: ['A. 第一次见面', 'B. 表白日', 'C. 牵手日', 'D. 其它']
+        },
+        {
+            q: '对方最喜欢的季节是？',
+            a: ['A. 春天', 'B. 夏天', 'C. 秋天', 'D. 冬天']
+        },
+        {
+            q: '你们最常一起点的外卖是什么？',
+            a: ['A. 火锅', 'B. 烧烤', 'C. 奶茶甜品', 'D. 快餐']
+        }
+    ];
+    const idx = Math.floor(Math.random() * quizList.length);
+    const quiz = quizList[idx];
+    showPrompt('情侣默契问答：\n' + quiz.q + '\n' + quiz.a.join('  '), function(answer) {
+        if (answer) {
+            showAlert('答案已记录！快和TA对答案吧~\n你选的是：' + answer);
+        }
+    });
+}
+
+    // 悄悄话弹幕功能
+function showWhisperInput() {
+    showPrompt('请输入悄悄话权限密码：', function(pwd) {
+        if (pwd !== 'zlyloveyzl') {
+            if (pwd !== null) showAlert('密码错误，无权限输入悄悄话！');
+            return;
+        }
+        showPrompt('写一句悄悄话（会以弹幕形式飘过页面底部）：', function(msg) {
+            if (msg && msg.trim()) {
+                // 敏感词列表，可根据需要扩展
+                const badWords = [
+                    '傻逼','sb','妈的','操','fuck','shit','草','狗','死','滚','贱','bitch','cnm','mlgb','煞笔','你妈','他妈','日你','屌','鸡巴','阴道','阳痿','高潮','肏','婊子','杂种','畜生','王八','二逼','弱智','智障','脑残','白痴','废物','垃圾','变态','淫','色鬼','小三','小贱','贱人','狗东西','狗屎','狗日','狗娘养的','猪','蠢','sb','tmd','nm','nmsl','nt','nmh','nmgb','nmzb','nmmp','nmll','nmzl','nmzj','nmzz','nmml','nmb','nmw','nmgd','nmgg','nmgn','nmgs','nmgl','nmga','nmge','nmgr','nmgt','nmgy','nmgh','nmgi','nmgo','nmgu','nmgi','nmga','nmgb','nmgsb','nmgnb','nmglb','nmglg','nmgls','nmglw','nmglz','nmglx','nmglc','nmglv','nmglf','nmglp','nmglq','nmglr','nmglj','nmglk','nmglh','nmglm','nmglb','nmglg','nmgls','nmglw','nmglz','nmglx','nmglc','nmglv','nmglf','nmglp','nmglq','nmglr','nmglj','nmglk','nmglh','nmglm','nmglb','nmglg','nmgls','nmglw','nmglz','nmglx','nmglc','nmglv','nmglf','nmglp','nmglq','nmglr','nmglj','nmglk','nmglh','nmglm','s逼','蠢猪'
+                ];
+                const lowerMsg = msg.trim().toLowerCase();
+                let hasBad = false;
+                for (let i = 0; i < badWords.length; i++) {
+                    if (lowerMsg.includes(badWords[i])) {
+                        hasBad = true;
+                        break;
+                    }
+                }
+                if (hasBad) {
+                    showAlert('内容包含不文明用语，请重新输入~');
+                    return;
+                }
+                addWhisperBarrage(msg.trim());
+            }
+        });
+    });
+}
+    function addWhisperBarrage(text) {
+        const container = document.getElementById('whisper-barrage-container');
+        const span = document.createElement('span');
+        span.textContent = text;
+        span.style.position = 'absolute';
+        span.style.left = '100vw';
+        span.style.bottom = (Math.random()*20) + 'px';
+        span.style.whiteSpace = 'nowrap';
+        span.style.fontSize = (18+Math.random()*8)+'px';
+        span.style.color = ['#ff6b9e','#6bd5ff','#ffd56b','#9e6bff','#baffc9'][Math.floor(Math.random()*5)];
+        span.style.background = 'rgba(255,255,255,0.7)';
+        span.style.borderRadius = '16px';
+        span.style.padding = '4px 16px';
+        span.style.marginRight = '8px';
+        span.style.boxShadow = '0 2px 8px #0001';
+        span.style.opacity = 0.95;
+        span.style.pointerEvents = 'none';
+        const duration = 7 + Math.random()*3;
+        span.style.transition = `transform ${duration}s linear`;
+        container.appendChild(span);
+        // 动画
+        setTimeout(()=>{
+            span.style.transform = `translateX(-110vw)`;
+        }, 30);
+        setTimeout(()=>span.remove(), duration*1000+1000);
+    }
+        // 配置项 - 个性化网页
+        const CONFIG = {
+            startDate: '2025-08-02T05:20:00', // 关系确立日期
+            names: {
+                me: '张xx',
+                you: '喻xx'
+            },
+            anniversaries: [
+                { days: 7, title: "🎉 恋爱一周纪念", message: "甜蜜的第一周只是开始哦~" },
+                { days: 30, title: "🌙 满月快乐", message: "一个月的糖分超标警告！" },
+                { days: 100, title: "💯 百日成就", message: "100天只是我们故事的序章" },
+                { days: 365, title: "🌸 周年纪念", message: "一年四季，最爱有你" },
+                { days: 520, title: "💖 520我爱你", message: "这个日子天生属于我们" }
+            ],
+            ourSong: 'https://music.163.com/song/media/outer/url?id=568389828.mp3' // 替换为你们的歌，只改musicID部分
+        };
+        
+        // 初始化页面内容
+        function initPage() {
+            document.title = `我们的云端恋爱日记 | ${CONFIG.names.me} & ${CONFIG.names.you}`;
+            document.querySelector('h1').textContent = '我们的云端恋爱日记';
+            document.querySelector('.subtitle').innerHTML = 
+                `${CONFIG.names.me} ❤️ ${CONFIG.names.you} | 始于 <span id="start-date">${formatDate(new Date(CONFIG.startDate))}</span>`;
+        }
+        
+        // 漂浮爱心效果
+        function createHearts() {
+            const container = document.getElementById('hearts-container');
+            const colors = ['#ff6b9e', '#6bd5ff', '#ffd56b', '#9e6bff'];
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+        }
+        
+        // 更新实时时间
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                `当前时间: ${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ` + 
+                `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        }
+        
+        // 精确计时和100天纪念日倒计时
+        function updateTimeTogether() {
+            const startDate = new Date(CONFIG.startDate);
+            const now = new Date();
+            const diff = now - startDate;
+            // 计算时间差
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            // 更新时间显示
+            document.getElementById('days-together').innerHTML = 
+                `${days}天<span class="small">${hours}小时${minutes}分${seconds}秒</span>`;
+            // 只显示100天纪念日倒计时
+            const daysLeft = 100 - days;
+            document.getElementById('next-anniversary').textContent = 
+                daysLeft > 0 ? `距离100天纪念日还有${daysLeft}天` : `已经超过100天纪念日${-daysLeft}天啦！`;
+            // 更新倒计时
+            updateCountdown();
+        }
+        
+        // 更新见面倒计时
+        function updateCountdown() {
+            const meetDate = new Date('2026-08-02T00:00:00'); // 修改为你们的见面日期
+            const now = new Date();
+            const diff = meetDate - now;
+            
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                document.getElementById('countdown').innerHTML = 
+                    `<p>距离见面还有: <strong>${days}天${hours}小时${minutes}分</strong></p>`;
+            } else {
+                document.getElementById('countdown').innerHTML = 
+                    `<p>我们已经见面啦！🎉 下次见面倒计时可以修改代码设置~</p>`;
+            }
+        }
+        
+        // 纪念日彩蛋
+        function checkAnniversary(days) {
+            const anniversary = CONFIG.anniversaries.find(a => a.days === days);
+            if (anniversary && !localStorage.getItem(`anniversary-${days}`)) {
+                showAnniversaryPopup(anniversary);
+                localStorage.setItem(`anniversary-${days}`, 'shown');
+            }
+        }
+        
+        // 显示纪念日弹窗
+        function showAnniversaryPopup(anniversary) {
+            const popup = document.createElement('div');
+            popup.className = 'anniversary-popup';
+            popup.innerHTML = `
+                <div class="anniversary-content">
+                    <button class="close-btn" onclick="this.parentNode.parentNode.remove()">×</button>
+                    <h2 style="color: var(--primary);">${anniversary.title}</h2>
+                    <p style="font-size: 1.2rem;">${anniversary.message}</p>
+                    <img src="https://via.placeholder.com/300x200?text=我们的${anniversary.days}天" 
+                         style="max-width: 100%; border-radius: 10px; margin: 1rem 0;">
+                    <p>这是我们爱的第 ${anniversary.days} 天</p>
+                    <button onclick="this.parentNode.parentNode.remove()" style="
+                        padding: 10px 20px;
+                        background: var(--primary);
+                        color: white;
+                        border: none;
+                        border-radius: 20px;
+                        margin-top: 1rem;
+                        cursor: pointer;
+                    ">继续书写我们的故事</button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+        
+        // 显示更新日期
+        function showUpdateDate() {
+            document.getElementById('update-date').textContent = formatDate(new Date());
+        }
+        
+        // 格式化日期
+        function formatDate(date) {
+            return `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`;
+        }
+        
+        // 播放/暂停我们的歌，并支持切换网易云音乐ID
+        // 保持音频对象全局唯一，避免多次播放重叠
+        let ourSongAudio = null;
+        function playOurSong() {
+            if (!ourSongAudio) {
+                ourSongAudio = new Audio(CONFIG.ourSong);
+                ourSongAudio.loop = false; // 如需循环播放可设为true
+                // 监听播放失败
+                ourSongAudio.onerror = function() {
+                    alert('无法播放音乐，可能该ID无版权或被下架，将恢复默认歌曲');
+                    // 恢复默认歌曲
+                    CONFIG.ourSong = 'https://music.163.com/song/media/outer/url?id=568389828.mp3';
+                    ourSongAudio = null;
+                };
+            }
+            if (ourSongAudio.paused) {
+                ourSongAudio.play().catch(e => alert('无法自动播放，请点击页面任意处后重试'));
+            } else {
+                ourSongAudio.pause();
+            }
+        }
+        // 网易云音乐ID切换功能（需密码）
+        function searchAndPlaySong() {
+            showPrompt('请输入更换歌曲的权限密码：', function(pwd) {
+                if (pwd !== 'zlyloveyzl') {
+                    if (pwd !== null) showAlert('密码错误，无权限更换歌曲！');
+                    return;
+                }
+                showPrompt('请输入网易云音乐的歌曲ID（数字，如568389828）：', function(musicId) {
+                    if (musicId && /^\d+$/.test(musicId)) {
+                        const url = `https://music.163.com/song/media/outer/url?id=${musicId}.mp3`;
+                        CONFIG.ourSong = url; // 更新配置
+                        if (ourSongAudio) {
+                            ourSongAudio.pause();
+                            ourSongAudio = null; // 释放旧对象
+                        }
+                        playOurSong(); // 播放新歌
+                    } else if (musicId) {
+                        showAlert('请输入正确的网易云音乐ID（纯数字）');
+                    }
+                });
+            });
+        }
+        // 如需单独暂停按钮，可调用 playOurSong() 或自定义
+        
+        // 显示记忆添加框
+        function showMemoryPrompt() {
+            showPrompt('添加新的美好回忆:\n(格式: 日期|标题|内容)\n例如: 2025-08-01|第一次视频通话|聊了整整三小时', function(memory) {
+                if (memory) {
+                    showAlert('回忆已添加! (实际功能需要后端支持保存)');
+                }
+            });
+        }
+        
+        // 显示爱情计算器
+        function showLoveCalculator() {
+            const lovePercent = Math.floor(Math.random() * 31) + 70; // 70-100%
+            alert(`❤️ 你们的匹配度是: ${lovePercent}% ❤️\n\n${CONFIG.names.me} 和 ${CONFIG.names.you} 是天造地设的一对！`);
+        }
+        
+        // 初始化
+        window.onload = function() {
+            initPage();
+            createHearts();
+            updateCurrentTime();
+            updateTimeTogether();
+            showUpdateDate();
+            
+            // 每秒更新时间
+            setInterval(updateCurrentTime, 1000);
+            setInterval(updateTimeTogether, 1000);
+        };
+    
+    // 戒烟打卡功能（隐藏入口，连续点击主标题5次弹出，支持本地存储）
+    (function(){
+        // 入口设置：连续点击主标题5次触发
+        let clickCount = 0;
+        let clickTimer = null;
+        const title = document.getElementById('main-title');
+        if (title) {
+            title.addEventListener('click', function() {
+                clickCount++;
+                if (clickTimer) clearTimeout(clickTimer);
+                // 2秒内连续点击才计数，否则重置
+                clickTimer = setTimeout(()=>{clickCount=0;}, 2000);
+                if (clickCount >= 5) {
+                    clickCount = 0;
+                    showQuitSmokingModal();
+                }
+            });
+        }
+
+        // 打开戒烟打卡弹窗
+        window.showQuitSmokingModal = function() {
+            document.getElementById('quit-smoking-modal').style.display = 'flex';
+            updateQuitSmokingUI();
+        };
+        // 关闭弹窗
+        window.closeQuitSmokingModal = function() {
+            document.getElementById('quit-smoking-modal').style.display = 'none';
+        };
+
+        // 获取今天日期字符串（yyyy-mm-dd）
+        function getTodayStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
+        }
+        // 获取昨天日期字符串
+        function getYesterdayStr() {
+            const d = new Date();
+            d.setDate(d.getDate()-1);
+            return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
+        }
+        // 获取本地存储的打卡数据
+        function getQSData() {
+            let data = localStorage.getItem('quitSmokingData');
+            if (!data) return {days:0, lastDate:'', history:[], streak:0, maxStreak:0, achievements:[]};
+            try {
+                let d = JSON.parse(data);
+                if (!d.history) d.history = [];
+                if (!d.achievements) d.achievements = [];
+                if (!d.streak) d.streak = 0;
+                if (!d.maxStreak) d.maxStreak = 0;
+                return d;
+            } catch { return {days:0, lastDate:'', history:[], streak:0, maxStreak:0, achievements:[]}; }
+        }
+        // 保存打卡数据到本地
+        function setQSData(data) {
+            localStorage.setItem('quitSmokingData', JSON.stringify(data));
+        }
+        // 更新弹窗UI显示
+        function updateQuitSmokingUI() {
+            const data = getQSData();
+            document.getElementById('qs-days').textContent = `累计打卡：${data.days||0} 天`;
+            document.getElementById('qs-streaks').textContent = `连续：${data.streak||0} 天  |  最长连续：${data.maxStreak||0} 天`;
+            document.getElementById('qs-last-date').textContent = data.lastDate ? `上次打卡：${data.lastDate}` : '还未开始打卡';
+            const today = getTodayStr();
+            const btn = document.getElementById('qs-punch-btn');
+            if (data.history && data.history.includes(today)) {
+                btn.disabled = true;
+                btn.textContent = '今日已打卡';
+                document.getElementById('qs-msg').textContent = getEncourageMsg(data.streak||0);
+            } else {
+                btn.disabled = false;
+                btn.textContent = '今日打卡';
+                document.getElementById('qs-msg').textContent = '';
+            }
+            // 打卡历史
+            renderQSHistory(data.history||[]);
+        }
+        // 鼓励语
+        function getEncourageMsg(streak) {
+            if (streak >= 30) return '你已经坚持30天，超棒！继续保持！';
+            if (streak >= 14) return '两周不易，习惯正在养成！';
+            if (streak >= 7) return '一周成就达成！继续加油！';
+            if (streak >= 3) return '已经坚持3天，迈出重要一步！';
+            if (streak > 0) return '继续加油！每一天都值得骄傲~';
+            return '';
+        }
+        // 打卡历史渲染
+        function renderQSHistory(history) {
+            const el = document.getElementById('qs-history');
+            if (!history || history.length === 0) {
+                el.innerHTML = '<span style="color:#bbb;">暂无打卡记录</span>';
+                return;
+            }
+            // 取最近7天
+            let arr = [];
+            let today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                let d = new Date(today);
+                d.setDate(d.getDate()-i);
+                let ds = d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
+                arr.push(ds);
+            }
+            let html = '<b>最近7天：</b><br>';
+            arr.forEach(date => {
+                if (history.includes(date)) {
+                    html += `<span style='color:#4caf50;'>✔️${date}</span> `;
+                } else {
+                    html += `<span style='color:#bbb;'>✖️${date}</span> `;
+                }
+            });
+            el.innerHTML = html;
+        }
+        // 点击“今日打卡”按钮逻辑
+        function punchQS() {
+            let data = getQSData();
+            const today = getTodayStr();
+            const yesterday = getYesterdayStr();
+            if (!data.history) data.history = [];
+            if (!data.achievements) data.achievements = [];
+            // 连续天数判断
+            if (data.history.length > 0 && data.history[data.history.length-1] === yesterday) {
+                data.streak = (data.streak||0) + 1;
+            } else if (data.history.length > 0 && data.history[data.history.length-1] === today) {
+                // 已打卡
+            } else {
+                data.streak = 1;
+            }
+            if (!data.history.includes(today)) {
+                data.history.push(today);
+                data.days = data.history.length;
+                data.lastDate = today;
+                if (!data.maxStreak || data.streak > data.maxStreak) data.maxStreak = data.streak;
+                setQSData(data);
+                checkQSAchievements(data);
+            }
+            updateQuitSmokingUI();
+        }
+        // 成就检测
+        function checkQSAchievements(data) {
+            const achs = [
+                {streak:3, msg:'🎉 连续打卡3天成就达成！习惯养成第一步！'},
+                {streak:7, msg:'🏅 连续打卡7天成就达成！一周不易，继续加油！'},
+                {streak:14, msg:'🥈 连续打卡14天成就达成！你已经很棒了！'},
+                {streak:30, msg:'🏆 连续打卡30天成就达成！你已经战胜了自己！'}
+            ];
+            for (let i=0;i<achs.length;i++) {
+                if (data.streak === achs[i].streak && !data.achievements.includes(achs[i].streak)) {
+                    data.achievements.push(achs[i].streak);
+                    setQSData(data);
+                    setTimeout(()=>{
+                        showQSAchievement(achs[i].msg);
+                    }, 300);
+                }
+            }
+        }
+        // 成就弹窗
+        function showQSAchievement(msg) {
+            const div = document.createElement('div');
+            div.style.position = 'fixed';
+            div.style.top = '30%';
+            div.style.left = '50%';
+            div.style.transform = 'translate(-50%,-50%)';
+            div.style.background = '#fff6fa';
+            div.style.color = '#ff6b9e';
+            div.style.padding = '1.2rem 2rem';
+            div.style.borderRadius = '18px';
+            div.style.fontSize = '1.2rem';
+            div.style.boxShadow = '0 8px 32px #0003';
+            div.style.zIndex = 100001;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(()=>{div.remove();}, 2600);
+        }
+        // 重置打卡
+        function resetQS() {
+            if (confirm('确定要重置所有打卡数据吗？此操作不可恢复。')) {
+                localStorage.removeItem('quitSmokingData');
+                updateQuitSmokingUI();
+            }
+        }
+        // 绑定按钮事件
+        document.getElementById('qs-punch-btn').onclick = punchQS;
+        document.getElementById('qs-reset-btn').onclick = resetQS;
+    })();
+    </script>
+</body>
+    </div>
+    <!-- 隐私遮罩已移除，页面内容恢复可见 -->
+    </html>
