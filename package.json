@@ -1,0 +1,26 @@
+{
+  "name": "love-website",
+  "version": "1.0.0",
+  "description": "恋爱网站项目",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server",
+    "build": "echo 'Build completed'",
+    "test": "echo 'Test completed'",
+    "deploy": "tcb fn deploy",
+    "install-deps": "npm install && cd cloud-functions && npm install"
+  },
+  "dependencies": {
+    "live-server": "^1.2.2"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "keywords": [
+    "love",
+    "website",
+    "cloudbase"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

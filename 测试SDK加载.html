@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>腾讯云SDK加载测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { border-left-color: #4CAF50; }
+        .error { border-left-color: #f44336; }
+        .warning { border-left-color: #ff9800; }
+        .info { border-left-color: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 腾讯云SDK加载测试</h1>
+        
+        <div class="test-section">
+            <h3>📁 文件检查</h3>
+            <button class="test-button" onclick="checkFiles()">检查SDK文件</button>
+            <div id="fileResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📥 SDK加载测试</h3>
+            <button class="test-button" onclick="testSDKLoad()">测试SDK加载</button>
+            <div id="sdkResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🌐 网络连接测试</h3>
+            <button class="test-button" onclick="testNetwork()">测试网络连接</button>
+            <div id="networkResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 全局对象检查</h3>
+            <button class="test-button" onclick="checkGlobalObjects()">检查全局对象</button>
+            <div id="globalResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🚀 完整测试</h3>
+            <button class="test-button" onclick="runFullTest()">运行完整测试</button>
+            <div id="fullResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // 测试结果记录
+        let testResults = [];
+        
+        function logResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            
+            element.textContent += logMessage;
+            element.scrollTop = element.scrollTop + 1000;
+            
+            // 添加类型标识
+            element.className = `result ${type}`;
+            
+            // 记录结果
+            testResults.push({ timestamp, message, type });
+        }
+        
+        // 检查SDK文件
+        async function checkFiles() {
+            const elementId = 'fileResult';
+            logResult(elementId, '开始检查SDK文件...', 'info');
+            
+            try {
+                // 检查本地文件
+                const response = await fetch('tencent-cloud-sdk/tencentcloud-sdk-js.min.js');
+                if (response.ok) {
+                    const size = response.headers.get('content-length');
+                    logResult(elementId, `✅ 本地SDK文件存在 (${size} 字节)`, 'success');
+                } else {
+                    logResult(elementId, `❌ 本地SDK文件访问失败: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                logResult(elementId, `❌ 本地SDK文件检查失败: ${error.message}`, 'error');
+            }
+            
+            // 检查CDN文件
+            const cdnUrls = [
+                'https://unpkg.com/tencentcloud-sdk-js@latest/dist/tencentcloud-sdk-js.min.js',
+                'https://cdn.jsdelivr.net/npm/tencentcloud-sdk-js@latest/dist/tencentcloud-sdk-js.min.js'
+            ];
+            
+            for (const url of cdnUrls) {
+                try {
+                    const response = await fetch(url, { mode: 'no-cors' });
+                    logResult(elementId, `✅ CDN文件可访问: ${url}`, 'success');
+                } catch (error) {
+                    logResult(elementId, `❌ CDN文件不可访问: ${url}`, 'error');
+                }
+            }
+        }
+        
+        // 测试SDK加载
+        async function testSDKLoad() {
+            const elementId = 'sdkResult';
+            logResult(elementId, '开始测试SDK加载...', 'info');
+            
+            try {
+                // 尝试加载本地SDK
+                logResult(elementId, '正在加载本地SDK...', 'info');
+                const script = document.createElement('script');
+                script.src = 'tencent-cloud-sdk/tencentcloud-sdk-js.min.js';
+                
+                const loadPromise = new Promise((resolve, reject) => {
+                    script.onload = () => resolve(true);
+                    script.onerror = () => reject(new Error('加载失败'));
+                    setTimeout(() => reject(new Error('加载超时')), 10000);
+                });
+                
+                document.head.appendChild(script);
+                
+                await loadPromise;
+                logResult(elementId, '✅ 本地SDK加载成功', 'success');
+                
+                // 检查全局对象
+                setTimeout(() => {
+                    if (typeof TencentCloud !== 'undefined') {
+                        logResult(elementId, '✅ 全局对象 TencentCloud 已定义', 'success');
+                        logResult(elementId, `SDK版本信息: ${JSON.stringify(TencentCloud, null, 2)}`, 'info');
+                    } else {
+                        logResult(elementId, '❌ 全局对象 TencentCloud 未定义', 'error');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                logResult(elementId, `❌ SDK加载失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 测试网络连接
+        async function testNetwork() {
+            const elementId = 'networkResult';
+            logResult(elementId, '开始测试网络连接...', 'info');
+            
+            const testUrls = [
+                'https://www.tencentcloud.com',
+                'https://iai.tencentcloudapi.com',
+                'https://unpkg.com',
+                'https://cdn.jsdelivr.net'
+            ];
+            
+            for (const url of testUrls) {
+                try {
+                    const response = await fetch(url, { 
+                        method: 'HEAD',
+                        mode: 'no-cors'
+                    });
+                    logResult(elementId, `✅ ${url} 连接成功`, 'success');
+                } catch (error) {
+                    logResult(elementId, `❌ ${url} 连接失败: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // 检查全局对象
+        function checkGlobalObjects() {
+            const elementId = 'globalResult';
+            logResult(elementId, '开始检查全局对象...', 'info');
+            
+            const objects = [
+                'TencentCloud',
+                'window.TencentCloud',
+                'globalThis.TencentCloud'
+            ];
+            
+            objects.forEach(objName => {
+                try {
+                    const obj = eval(objName);
+                    if (obj) {
+                        logResult(elementId, `✅ ${objName} 已定义`, 'success');
+                        logResult(elementId, `类型: ${typeof obj}`, 'info');
+                    } else {
+                        logResult(elementId, `❌ ${objName} 未定义`, 'error');
+                    }
+                } catch (error) {
+                    logResult(elementId, `❌ ${objName} 检查失败: ${error.message}`, 'error');
+                }
+            });
+        }
+        
+        // 运行完整测试
+        async function runFullTest() {
+            const elementId = 'fullResult';
+            logResult(elementId, '🚀 开始运行完整测试...', 'info');
+            
+            // 清空之前的结果
+            testResults = [];
+            
+            // 按顺序运行测试
+            await checkFiles();
+            await testNetwork();
+            await testSDKLoad();
+            setTimeout(checkGlobalObjects, 2000);
+            
+            logResult(elementId, '🎉 完整测试完成！', 'success');
+            
+            // 生成测试报告
+            const successCount = testResults.filter(r => r.type === 'success').length;
+            const errorCount = testResults.filter(r => r.type === 'error').length;
+            const totalCount = testResults.length;
+            
+            logResult(elementId, `\n📊 测试报告:`, 'info');
+            logResult(elementId, `总测试数: ${totalCount}`, 'info');
+            logResult(elementId, `成功: ${successCount}`, 'success');
+            logResult(elementId, `失败: ${errorCount}`, errorCount > 0 ? 'error' : 'success');
+            logResult(elementId, `成功率: ${((successCount / totalCount) * 100).toFixed(1)}%`, 'info');
+        }
+        
+        // 页面加载完成后自动运行基础检查
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                logResult('fullResult', '🔄 页面加载完成，可以开始测试...', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

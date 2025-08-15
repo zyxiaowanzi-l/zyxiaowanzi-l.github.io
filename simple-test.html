@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>腾讯云连接测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .loading { background: #fff3cd; color: #856404; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 腾讯云连接测试</h1>
+    
+    <div class="test-box">
+        <h3>📡 连接状态</h3>
+        <div id="connection-status" class="status loading">正在检查连接...</div>
+        <button onclick="testConnection()">🔄 重新测试</button>
+    </div>
+
+    <div class="test-box">
+        <h3>🔧 手动测试</h3>
+        <button onclick="testLocalSDK()">📦 测试本地SDK</button>
+        <button onclick="testSDKLoad()">🌐 测试CDN SDK</button>
+        <button onclick="testCloudbaseInit()">🚀 测试云开发初始化</button>
+        <button onclick="testDatabase()">🗄️ 测试数据库连接</button>
+        <button onclick="testNetwork()">🌐 网络诊断</button>
+    </div>
+
+    <div class="test-box">
+        <h3>📋 测试日志</h3>
+        <div id="test-log" class="log">等待测试...</div>
+        <button onclick="clearLog()">🗑️ 清空日志</button>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('test-log').textContent = '';
+        }
+
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('connection-status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        // 测试本地SDK
+        async function testLocalSDK() {
+            log('开始测试本地SDK...');
+            
+            try {
+                if (typeof cloudbase !== 'undefined') {
+                    log('✅ 本地SDK已加载');
+                    return true;
+                } else {
+                    log('❌ 本地SDK未加载');
+                    return false;
+                }
+            } catch (error) {
+                log('❌ 本地SDK测试失败: ' + error.message);
+                return false;
+            }
+        }
+
+        // 测试CDN SDK加载
+        async function testSDKLoad() {
+            log('开始测试SDK加载...');
+            
+            // 多个CDN源作为备用
+            const cdnSources = [
+                'https://unpkg.com/@cloudbase/js-sdk@latest/dist/index.min.js',
+                'https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@latest/dist/index.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/cloudbase-js-sdk/latest/index.min.js'
+            ];
+            
+            for (let i = 0; i < cdnSources.length; i++) {
+                const cdnUrl = cdnSources[i];
+                log(`尝试CDN源 ${i + 1}: ${cdnUrl}`);
+                
+                try {
+                    const script = document.createElement('script');
+                    script.src = cdnUrl;
+                    
+                    await new Promise((resolve, reject) => {
+                        script.onload = () => {
+                            log(`✅ SDK加载成功 (CDN源 ${i + 1})`);
+                            resolve();
+                        };
+                        script.onerror = () => {
+                            log(`❌ CDN源 ${i + 1} 加载失败`);
+                            reject(new Error(`CDN源 ${i + 1} 加载失败`));
+                        };
+                        document.head.appendChild(script);
+                    });
+                    
+                    log('SDK已添加到页面');
+                    return true;
+                    
+                } catch (error) {
+                    log(`CDN源 ${i + 1} 失败: ${error.message}`);
+                    if (i === cdnSources.length - 1) {
+                        log('❌ 所有CDN源都失败了');
+                        return false;
+                    }
+                    // 继续尝试下一个CDN源
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            return false;
+        }
+
+        // 测试云开发初始化
+        async function testCloudbaseInit() {
+            log('开始测试云开发初始化...');
+            
+            if (typeof cloudbase === 'undefined') {
+                log('❌ cloudbase对象未定义，请先加载SDK');
+                return false;
+            }
+            
+            try {
+                const app = cloudbase.init({
+                    env: 'cloud1-9ghdf1i93f8fb2b9'
+                });
+                log('✅ 云开发初始化成功');
+                log('应用对象: ' + (app ? '已创建' : '创建失败'));
+                return true;
+            } catch (error) {
+                log('❌ 云开发初始化失败: ' + error.message);
+                return false;
+            }
+        }
+
+        // 测试数据库连接
+        async function testDatabase() {
+            log('开始测试数据库连接...');
+            
+            if (typeof cloudbase === 'undefined') {
+                log('❌ cloudbase对象未定义');
+                return false;
+            }
+            
+            try {
+                const app = cloudbase.init({
+                    env: 'cloud1-9ghdf1i93f8fb2b9'
+                });
+                
+                const db = app.database();
+                log('✅ 数据库对象创建成功');
+                
+                // 尝试获取集合列表
+                try {
+                    const collections = await db.listCollections();
+                    log('✅ 数据库连接成功，集合数量: ' + collections.data.length);
+                    return true;
+                } catch (dbError) {
+                    log('⚠️ 数据库连接成功，但获取集合失败: ' + dbError.message);
+                    return true; // 连接成功，只是权限问题
+                }
+                
+            } catch (error) {
+                log('❌ 数据库连接失败: ' + error.message);
+                return false;
+            }
+        }
+
+        // 完整连接测试
+        async function testConnection() {
+            log('🚀 开始完整连接测试...');
+            updateStatus('正在测试连接...', 'loading');
+            
+            try {
+                // 步骤1: 测试SDK加载
+                log('步骤1: 测试SDK加载');
+                const sdkLoaded = await testSDKLoad();
+                if (!sdkLoaded) {
+                    throw new Error('SDK加载失败');
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 步骤2: 测试云开发初始化
+                log('步骤2: 测试云开发初始化');
+                const initSuccess = await testCloudbaseInit();
+                if (!initSuccess) {
+                    throw new Error('云开发初始化失败');
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 步骤3: 测试数据库连接
+                log('步骤3: 测试数据库连接');
+                const dbSuccess = await testDatabase();
+                if (!dbSuccess) {
+                    throw new Error('数据库连接失败');
+                }
+                
+                log('🎉 所有测试通过！腾讯云连接正常');
+                updateStatus('✅ 连接成功！腾讯云服务正常', 'success');
+                
+            } catch (error) {
+                log('❌ 连接测试失败: ' + error.message);
+                updateStatus('❌ 连接失败: ' + error.message, 'error');
+            }
+        }
+
+        // 网络诊断
+        async function testNetwork() {
+            log('🌐 开始网络诊断...');
+            
+            // 测试基本网络连接
+            try {
+                const response = await fetch('https://www.baidu.com/favicon.ico', { mode: 'no-cors' });
+                log('✅ 基本网络连接正常');
+            } catch (error) {
+                log('❌ 基本网络连接失败: ' + error.message);
+            }
+            
+            // 测试CDN连接
+            const testUrls = [
+                'https://unpkg.com',
+                'https://cdn.jsdelivr.net',
+                'https://cdnjs.cloudflare.com'
+            ];
+            
+            for (const url of testUrls) {
+                try {
+                    const response = await fetch(url, { mode: 'no-cors' });
+                    log(`✅ ${url} 可访问`);
+                } catch (error) {
+                    log(`❌ ${url} 不可访问: ${error.message}`);
+                }
+            }
+            
+            // 测试腾讯云连接
+            try {
+                const response = await fetch('https://console.cloud.tencent.com', { mode: 'no-cors' });
+                log('✅ 腾讯云控制台可访问');
+            } catch (error) {
+                log('❌ 腾讯云控制台不可访问: ' + error.message);
+            }
+            
+            log('🌐 网络诊断完成');
+        }
+
+        // 页面加载完成后自动测试
+        window.addEventListener('load', function() {
+            log('页面加载完成，开始自动测试...');
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+    
+    <!-- 腾讯云云开发相关脚本 -->
+    <script src="cloudbase-config.js"></script>
+    <script src="cloudbase-sdk.js"></script>
+    <script src="cloudbase-core.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "love-website-cloud-functions",
+  "version": "1.0.0",
+  "description": "恋爱网站云函数集合",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "tcb fn deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@cloudbase/node-sdk": "^2.6.0"
+  },
+  "keywords": [
+    "tencent",
+    "cloudbase",
+    "cloud-functions",
+    "love-website"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

@@ -1,0 +1,115 @@
+{
+  "collections": {
+    "love_feed": {
+      "description": "恋爱动态集合",
+      "fields": {
+        "_id": "string",
+        "content": "string",
+        "type": "string",
+        "mediaUrl": "string",
+        "date": "string",
+        "createTime": "date",
+        "status": "string",
+        "userId": "string"
+      },
+      "indexes": [
+        {
+          "name": "status_createTime",
+          "fields": ["status", "createTime"],
+          "direction": "desc"
+        },
+        {
+          "name": "userId_date",
+          "fields": ["userId", "date"],
+          "direction": "desc"
+        }
+      ]
+    },
+    "interactions": {
+      "description": "用户互动记录集合",
+      "fields": {
+        "_id": "string",
+        "type": "string",
+        "data": "object",
+        "timestamp": "date",
+        "userAgent": "string",
+        "ip": "string",
+        "userId": "string"
+      },
+      "indexes": [
+        {
+          "name": "type_timestamp",
+          "fields": ["type", "timestamp"],
+          "direction": "desc"
+        },
+        {
+          "name": "userId_type",
+          "fields": ["userId", "type"],
+          "direction": "desc"
+        }
+      ]
+    },
+    "memories": {
+      "description": "美好回忆集合",
+      "fields": {
+        "_id": "string",
+        "title": "string",
+        "content": "string",
+        "category": "string",
+        "date": "string",
+        "createTime": "date",
+        "status": "string",
+        "userId": "string"
+      },
+      "indexes": [
+        {
+          "name": "status_createTime",
+          "fields": ["status", "createTime"],
+          "direction": "desc"
+        },
+        {
+          "name": "category_status",
+          "fields": ["category", "status"],
+          "direction": "asc"
+        }
+      ]
+    },
+    "users": {
+      "description": "用户信息集合",
+      "fields": {
+        "_id": "string",
+        "nickname": "string",
+        "avatar": "string",
+        "email": "string",
+        "createTime": "date",
+        "lastLoginTime": "date",
+        "status": "string"
+      },
+      "indexes": [
+        {
+          "name": "status_createTime",
+          "fields": ["status", "createTime"],
+          "direction": "desc"
+        }
+      ]
+    }
+  },
+  "permissions": {
+    "love_feed": {
+      "read": true,
+      "write": true
+    },
+    "interactions": {
+      "read": false,
+      "write": true
+    },
+    "memories": {
+      "read": true,
+      "write": true
+    },
+    "users": {
+      "read": false,
+      "write": true
+    }
+  }
+}
